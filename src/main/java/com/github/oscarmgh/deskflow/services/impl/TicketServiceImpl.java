@@ -74,4 +74,27 @@ public class TicketServiceImpl implements TicketService {
 
         return new TicketResponse(ticket);
     }
+
+    public TicketResponse updateTicketStatus(
+            Long ticketId,
+            TicketStatus status,
+            User user) {
+
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException(ticketId.toString()));
+
+        if (!ticket.getUser().getId().equals(user.getId())) {
+            throw new TicketNotFoundException("Ticket not found");
+        }
+
+        if (ticket.getDemo()) {
+            throw new IllegalStateException("Demo tickets cannot be updated");
+        }
+
+        ticket.setStatus(status);
+
+        Ticket updated = ticketRepository.save(ticket);
+
+        return new TicketResponse(updated);
+    }
 }

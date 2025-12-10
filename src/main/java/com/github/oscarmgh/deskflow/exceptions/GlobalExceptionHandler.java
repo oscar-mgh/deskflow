@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.github.oscarmgh.deskflow.exceptions.auth.EmailExistsException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InactiveUserException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InvalidCredentialsException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.TicketNotFoundException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.UnauthorizedTicketAccessException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -25,6 +27,30 @@ public class GlobalExceptionHandler {
 		return buildResponse(
 				HttpStatus.UNAUTHORIZED,
 				"INVALID_CREDENTIALS",
+				ex.getMessage(),
+				request.getRequestURI());
+	}
+
+	@ExceptionHandler(TicketNotFoundException.class)
+	public ResponseEntity<ApiErrorResponse> handleTicketNotFound(
+			TicketNotFoundException ex,
+			HttpServletRequest request) {
+
+		return buildResponse(
+				HttpStatus.NOT_FOUND,
+				"TICKET_NOT_FOUND",
+				ex.getMessage(),
+				request.getRequestURI());
+	}
+
+	@ExceptionHandler(UnauthorizedTicketAccessException.class)
+	public ResponseEntity<ApiErrorResponse> handleUnauthorizedTicketAccess(
+			UnauthorizedTicketAccessException ex,
+			HttpServletRequest request) {
+
+		return buildResponse(
+				HttpStatus.FORBIDDEN,
+				"UNAUTHORIZED_TICKET_ACCESS",
 				ex.getMessage(),
 				request.getRequestURI());
 	}

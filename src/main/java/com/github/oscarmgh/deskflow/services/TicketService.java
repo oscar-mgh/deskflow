@@ -5,6 +5,7 @@ import java.util.List;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketResponse;
 import com.github.oscarmgh.deskflow.entities.User;
+import com.github.oscarmgh.deskflow.entities.enums.TicketStatus;
 
 public interface TicketService {
 
@@ -19,4 +20,6 @@ public interface TicketService {
     TicketResponse getById(Long id);
 
     TicketResponse getUserTicket(Long id, User user);
+
+    TicketResponse updateTicketStatus(Long id, TicketStatus status, User user);
 }

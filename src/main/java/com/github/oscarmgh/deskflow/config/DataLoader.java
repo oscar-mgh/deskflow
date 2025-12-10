@@ -1,11 +1,17 @@
 package com.github.oscarmgh.deskflow.config;
 
+import java.util.List;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import com.github.oscarmgh.deskflow.entities.Ticket;
 import com.github.oscarmgh.deskflow.entities.User;
+import com.github.oscarmgh.deskflow.entities.enums.TicketPriority;
+import com.github.oscarmgh.deskflow.entities.enums.TicketStatus;
 import com.github.oscarmgh.deskflow.entities.enums.UserRole;
+import com.github.oscarmgh.deskflow.repositories.TicketRepository;
 import com.github.oscarmgh.deskflow.repositories.UserRepository;
 import com.github.oscarmgh.deskflow.services.TokenService;
 
@@ -18,6 +24,7 @@ public class DataLoader implements CommandLineRunner {
 
 	private final UserRepository userRepository;
 	private final TokenService tokenService;
+	private final TicketRepository ticketRepository;
 
 	@Override
 	public void run(String... args) {
@@ -68,5 +75,33 @@ public class DataLoader implements CommandLineRunner {
 		tokenService.generateToken(admin);
 
 		System.out.println("Users created for DEV profile!");
+
+		if (ticketRepository.count() == 0) {
+            ticketRepository.saveAll(List.of(
+                Ticket.builder()
+                    .title("No puedo iniciar sesión")
+                    .description("El sistema rechaza mi contraseña")
+                    .status(TicketStatus.OPEN)
+                    .priority(TicketPriority.HIGH)
+                    .demo(true)
+                    .build(),
+
+                Ticket.builder()
+                    .title("Factura incorrecta")
+                    .description("El monto no coincide")
+                    .status(TicketStatus.IN_PROGRESS)
+                    .priority(TicketPriority.MEDIUM)
+                    .demo(true)
+                    .build(),
+
+                Ticket.builder()
+                    .title("App lenta")
+                    .description("La app tarda en cargar")
+                    .status(TicketStatus.RESOLVED)
+                    .priority(TicketPriority.LOW)
+                    .demo(true)
+                    .build()
+            ));
+        }
 	}
 }

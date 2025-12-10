@@ -1,6 +1,6 @@
 package com.github.oscarmgh.deskflow.entities.enums;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import com.github.oscarmgh.deskflow.entities.Ticket;
 
@@ -39,5 +39,5 @@ public class TicketFile {
 	private Ticket ticket;
 
 	@Column(nullable = false)
-	private LocalDateTime uploadedAt = LocalDateTime.now();
+	private OffsetDateTime uploadedAt = OffsetDateTime.now();
 }

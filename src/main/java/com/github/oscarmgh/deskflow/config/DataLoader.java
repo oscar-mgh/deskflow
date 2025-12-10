@@ -29,7 +29,7 @@ public class DataLoader implements CommandLineRunner {
 		User guest = User.builder()
 				.fullName("Guest User")
 				.email("guest@deskflow.com")
-				.password("DeskflowUser")
+				.password("$2a$12$F/vIGCzJf2dRrZjk86kuueuHyYqC1UL9NYHIMsAxzAJ0DNDzQ9sgS")
 				.role(UserRole.GUEST)
 				.active(true)
 				.build();
@@ -37,7 +37,7 @@ public class DataLoader implements CommandLineRunner {
 		User normal = User.builder()
 				.fullName("Normal User")
 				.email("user@deskflow.com")
-				.password("DeskflowUser")
+				.password("$2a$12$F/vIGCzJf2dRrZjk86kuueuHyYqC1UL9NYHIMsAxzAJ0DNDzQ9sgS")
 				.role(UserRole.USER)
 				.active(true)
 				.build();
@@ -45,7 +45,7 @@ public class DataLoader implements CommandLineRunner {
 		User premium = User.builder()
 				.fullName("Premium User")
 				.email("premium@deskflow.com")
-				.password("DeskflowUser")
+				.password("$2a$12$F/vIGCzJf2dRrZjk86kuueuHyYqC1UL9NYHIMsAxzAJ0DNDzQ9sgS")
 				.role(UserRole.PREMIUM)
 				.active(true)
 				.build();
@@ -53,7 +53,7 @@ public class DataLoader implements CommandLineRunner {
 		User admin = User.builder()
 				.fullName("Admin User")
 				.email("admin@deskflow.com")
-				.password("DeskflowAdmin")
+				.password("$2a$12$XVOxLQ9lyOaYKdgfYCgqnOiqSvfZj6ftpV8B.o71w.gipU4Uleusi")
 				.role(UserRole.ADMIN)
 				.active(true)
 				.build();

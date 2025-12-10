@@ -11,5 +11,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
 	List<Ticket> findByDemoTrue();
 
-	List<Ticket> findByUser(User user);
+	List<Ticket> findByUserAndDemoFalse(User user);
 }

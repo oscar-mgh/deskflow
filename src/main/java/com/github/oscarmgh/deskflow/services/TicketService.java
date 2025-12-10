@@ -2,75 +2,21 @@ package com.github.oscarmgh.deskflow.services;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketResponse;
-import com.github.oscarmgh.deskflow.entities.Ticket;
 import com.github.oscarmgh.deskflow.entities.User;
-import com.github.oscarmgh.deskflow.entities.enums.TicketStatus;
-import com.github.oscarmgh.deskflow.exceptions.tickets.TicketNotFoundException;
-import com.github.oscarmgh.deskflow.repositories.TicketRepository;
 
-import lombok.RequiredArgsConstructor;
+public interface TicketService {
 
-@Service
-@RequiredArgsConstructor
-@Transactional
-public class TicketService {
+    List<TicketResponse> getDemoTickets();
 
-    private final TicketRepository ticketRepository;
+    TicketResponse getDemoTicket(Long id);
 
-    public List<TicketResponse> getDemoTickets() {
-        return ticketRepository.findByDemoTrue()
-                .stream()
-                .map(TicketResponse::new)
-                .toList();
-    }
+    List<TicketResponse> getUserTickets(User user);
 
-    public TicketResponse getDemoTicket(Long id) {
-        Ticket ticket = ticketRepository.findById(id)
-                .filter(Ticket::getDemo)
-                .orElseThrow(() -> new TicketNotFoundException());
-        return new TicketResponse(ticket);
-    }
+    TicketResponse createTicket(TicketRequest request, User user);
 
-    public List<TicketResponse> getUserTickets(User user) {
-        return ticketRepository.findByUser(user)
-                .stream()
-                .map(TicketResponse::new)
-                .toList();
-    }
+    TicketResponse getById(Long id);
 
-    public TicketResponse createTicket(TicketRequest request, User user) {
-        Ticket ticket = Ticket.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .status(TicketStatus.OPEN)
-                .priority(request.getPriority())
-                .user(user)
-                .demo(false)
-                .build();
-
-        Ticket saved = ticketRepository.save(ticket);
-        return new TicketResponse(saved);
-    }
-
-    public TicketResponse getById(Long id) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new TicketNotFoundException());
-        return new TicketResponse(ticket);
-    }
-
-    public TicketResponse getUserTicket(Long id, User user) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new TicketNotFoundException());
-
-        if (ticket.getUser() == null || !ticket.getUser().getId().equals(user.getId())) {
-            throw new TicketNotFoundException();
-        }
-
-        return new TicketResponse(ticket);
-    }
+    TicketResponse getUserTicket(Long id, User user);
 }

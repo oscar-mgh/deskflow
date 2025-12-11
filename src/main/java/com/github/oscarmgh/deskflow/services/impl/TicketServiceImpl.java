@@ -75,11 +75,7 @@ public class TicketServiceImpl implements TicketService {
         return new TicketResponse(ticket);
     }
 
-    public TicketResponse updateTicketStatus(
-            Long ticketId,
-            TicketStatus status,
-            User user) {
-
+    public TicketResponse updateTicket(Long ticketId, TicketRequest request, User user) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException(ticketId.toString()));
 
@@ -91,10 +87,36 @@ public class TicketServiceImpl implements TicketService {
             throw new IllegalStateException("Demo tickets cannot be updated");
         }
 
-        ticket.setStatus(status);
+        if (request.getTitle() != null) {
+            ticket.setTitle(request.getTitle());
+            request.getTitle();
+        }
+        if (request.getDescription() != null) {
+            ticket.setDescription(request.getDescription());
+            request.getDescription();
+        }
+        if (request.getPriority() != null) {
+            ticket.setPriority(request.getPriority());
+            request.getPriority().name();
+        }
+        if (request.getStatus() != null) {
+            ticket.setStatus(request.getStatus());
+            request.getStatus().name();
+        }
 
         Ticket updated = ticketRepository.save(ticket);
-
         return new TicketResponse(updated);
+    }
+
+    public void deleteTicket(Long ticketId, User user) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException(ticketId.toString()));
+        if (!ticket.getUser().getId().equals(user.getId())) {
+            throw new TicketNotFoundException("Ticket not found");
+        }
+        if (ticket.getDemo()) {
+            throw new IllegalStateException("Demo tickets cannot be deleted");
+        }
+        ticketRepository.delete(ticket);
     }
 }

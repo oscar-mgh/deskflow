@@ -79,11 +79,11 @@ public class DataLoader implements CommandLineRunner {
         TicketCategory loginCategory = categoryRepository.save(
                 TicketCategory.builder().name("Login").build()
         );
-        TicketCategory billingCategory = categoryRepository.save(
-                TicketCategory.builder().name("Billing").build()
+        TicketCategory generalCategory = categoryRepository.save(
+                TicketCategory.builder().name("General").build()
         );
-        TicketCategory performanceCategory = categoryRepository.save(
-                TicketCategory.builder().name("Rendimiento").build()
+        TicketCategory bugCategory = categoryRepository.save(
+                TicketCategory.builder().name("Bug").build()
         );
 
         if (ticketRepository.count() == 0) {
@@ -103,7 +103,7 @@ public class DataLoader implements CommandLineRunner {
                     .status(TicketStatus.IN_PROGRESS)
                     .priority(TicketPriority.MEDIUM)
                     .demo(true)
-                    .category(billingCategory)
+                    .category(generalCategory)
                     .build(),
 
                 Ticket.builder()
@@ -112,7 +112,7 @@ public class DataLoader implements CommandLineRunner {
                     .status(TicketStatus.RESOLVED)
                     .priority(TicketPriority.LOW)
                     .demo(true)
-                    .category(performanceCategory)
+                    .category(bugCategory)
                     .build()
             ));
         }

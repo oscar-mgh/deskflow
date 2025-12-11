@@ -62,12 +62,11 @@ public class TokenServiceImpl implements TokenService {
 
 	@Transactional
 	public void revokeToken(String tokenValue) {
+		UserToken token = tokenRepository.findByTokenAndRevokedFalse(tokenValue)
+				.orElseThrow(() -> new RuntimeException("Token not found or already revoked"));
 
-		tokenRepository.findByTokenAndRevokedFalse(tokenValue)
-				.ifPresent(token -> {
-					token.setRevoked(true);
-					tokenRepository.save(token);
-				});
+		token.setRevoked(true);
+		tokenRepository.save(token);
 	}
 
 	private String generateRandomToken() {

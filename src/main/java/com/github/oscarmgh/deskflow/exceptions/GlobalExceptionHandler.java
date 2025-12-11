@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.github.oscarmgh.deskflow.exceptions.auth.EmailExistsException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InactiveUserException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InvalidCredentialsException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.CategoryNotFoundException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.TicketNotFoundException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.UnauthorizedTicketAccessException;
 
@@ -27,6 +28,18 @@ public class GlobalExceptionHandler {
 		return buildResponse(
 				HttpStatus.UNAUTHORIZED,
 				"INVALID_CREDENTIALS",
+				ex.getMessage(),
+				request.getRequestURI());
+	}
+
+	@ExceptionHandler(CategoryNotFoundException.class)
+	public ResponseEntity<ApiErrorResponse> handleTicketNotFound(
+			CategoryNotFoundException ex,
+			HttpServletRequest request) {
+
+		return buildResponse(
+				HttpStatus.NOT_FOUND,
+				"CATEGORY_NOT_FOUND",
 				ex.getMessage(),
 				request.getRequestURI());
 	}

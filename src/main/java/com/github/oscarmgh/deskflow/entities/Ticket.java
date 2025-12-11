@@ -61,6 +61,10 @@ public class Ticket {
 	@Column(name = "created_at", nullable = false)
 	private OffsetDateTime createdAt;
 
+	@ManyToOne
+	@JoinColumn(name = "category_id")
+	private TicketCategory category;
+
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = OffsetDateTime.now(ZoneOffset.UTC);

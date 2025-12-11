@@ -10,4 +10,5 @@ public class TicketRequest {
 	private String title;
 	private String description;
 	private TicketPriority priority;
+	private String categoryName;
 }

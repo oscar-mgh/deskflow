@@ -33,7 +33,7 @@ public class TicketCategory {
     private String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> tickets = new ArrayList<>();
+    private final List<Ticket> tickets = new ArrayList<>();
 
     public void removeTicket(Ticket ticket) {
         this.tickets.remove(ticket);

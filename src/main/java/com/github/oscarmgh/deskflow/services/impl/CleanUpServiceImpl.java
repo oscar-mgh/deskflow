@@ -5,17 +5,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.oscarmgh.deskflow.repositories.TicketRepository;
+import com.github.oscarmgh.deskflow.services.CleanUpService;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
-public class CleanUpService {
+public class CleanUpServiceImpl implements CleanUpService {
 
 	private final TicketRepository repository;
 
-	public CleanUpService(TicketRepository repository) {
+	public CleanUpServiceImpl(TicketRepository repository) {
 		this.repository = repository;
 	}
 

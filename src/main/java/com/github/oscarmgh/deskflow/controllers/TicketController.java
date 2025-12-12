@@ -4,21 +4,23 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.github.oscarmgh.deskflow.dtos.ticket.TicketFileResponse;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketResponse;
 import com.github.oscarmgh.deskflow.entities.User;
-import com.github.oscarmgh.deskflow.entities.enums.TicketStatus;
 import com.github.oscarmgh.deskflow.services.TicketService;
+import com.github.oscarmgh.deskflow.services.impl.TicketFileServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketController {
 
 	private final TicketService ticketService;
+	private final TicketFileServiceImpl fileService;
 
 	@GetMapping("/public/tickets")
 	public List<TicketResponse> demoTickets() {
@@ -77,4 +80,11 @@ public class TicketController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@PostMapping("/tickets/{id}/files")
+	public ResponseEntity<TicketFileResponse> uploadFile(
+			@PathVariable Long id,
+			@RequestParam MultipartFile file) {
+		TicketFileResponse response = fileService.uploadFile(id, file);
+		return ResponseEntity.ok(response);
+	}
 }

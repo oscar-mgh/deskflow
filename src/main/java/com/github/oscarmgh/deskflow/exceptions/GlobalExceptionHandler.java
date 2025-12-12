@@ -87,7 +87,7 @@ public class GlobalExceptionHandler {
 
 		return buildResponse(
 				HttpStatus.FORBIDDEN,
-				"USER_INACTIVE",
+				"INACTIVE_USER",
 				ex.getMessage(),
 				request.getRequestURI());
 	}
@@ -102,7 +102,7 @@ public class GlobalExceptionHandler {
 				.stream()
 				.findFirst()
 				.map(e -> e.getField() + ": " + e.getDefaultMessage())
-				.orElse("Error de validación");
+				.orElse("Validation error");
 
 		return buildResponse(
 				HttpStatus.BAD_REQUEST,

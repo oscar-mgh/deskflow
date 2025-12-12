@@ -32,7 +32,10 @@ public class TicketFile {
 	private String fileUrl;
 
 	@Column(nullable = false)
-	private String fileType;
+	private String mimeType;
+
+	@Column(nullable = false)
+	private String publicId;
 
 	@ManyToOne
 	@JoinColumn(name = "ticket_id", nullable = false)

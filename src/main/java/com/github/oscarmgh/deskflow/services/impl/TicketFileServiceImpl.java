@@ -12,17 +12,21 @@ import com.github.oscarmgh.deskflow.entities.Ticket;
 import com.github.oscarmgh.deskflow.entities.User;
 import com.github.oscarmgh.deskflow.entities.enums.TicketFile;
 import com.github.oscarmgh.deskflow.entities.enums.UserRole;
+import com.github.oscarmgh.deskflow.exceptions.tickets.FileDeleteNotAllowedException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.FileUploadNotAllowedException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.TicketFileNotFoundException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.TicketNotFoundException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.UnauthorizedTicketAccessException;
 import com.github.oscarmgh.deskflow.repositories.TicketFileRepository;
 import com.github.oscarmgh.deskflow.repositories.TicketRepository;
 import com.github.oscarmgh.deskflow.services.CloudinaryService;
+import com.github.oscarmgh.deskflow.services.TicketFileService;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class TicketFileServiceImpl {
+public class TicketFileServiceImpl implements TicketFileService {
 
 	private final TicketRepository ticketRepository;
 	private final TicketFileRepository ticketFileRepository;
@@ -32,7 +36,7 @@ public class TicketFileServiceImpl {
 
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-		if (user.getRole() != UserRole.PREMIUM || user.getRole() != UserRole.ADMIN) {
+		if (user.getRole() != UserRole.PREMIUM && user.getRole() != UserRole.ADMIN) {
 			throw new FileUploadNotAllowedException();
 		}
 
@@ -51,5 +55,27 @@ public class TicketFileServiceImpl {
 		TicketFile saved = ticketFileRepository.save(ticketFile);
 
 		return TicketFileMapper.toResponse(saved);
+	}
+
+	public void deleteFile(Long ticketId, Long fileId) {
+
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		System.out.println(user.getRole());
+		System.out.println(user.getRole() != UserRole.PREMIUM);
+		System.out.println(user.getRole() != UserRole.ADMIN);
+
+		if (user.getRole() != UserRole.PREMIUM && user.getRole() != UserRole.ADMIN) {
+			throw new FileDeleteNotAllowedException();
+		}
+
+		TicketFile file = ticketFileRepository.findById(fileId)
+				.orElseThrow(TicketFileNotFoundException::new);
+
+		if (!file.getTicket().getId().equals(ticketId)) {
+			throw new UnauthorizedTicketAccessException();
+		}
+		cloudinaryService.delete(file.getPublicId());
+		ticketFileRepository.delete(file);
 	}
 }

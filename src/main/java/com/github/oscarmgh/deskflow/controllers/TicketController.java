@@ -87,4 +87,12 @@ public class TicketController {
 		TicketFileResponse response = fileService.uploadFile(id, file);
 		return ResponseEntity.ok(response);
 	}
+
+	@DeleteMapping("/tickets/{id}/files/{fileId}")
+	public ResponseEntity<Void> deleteFile(
+			@PathVariable Long id,
+			@PathVariable Long fileId) {
+		fileService.deleteFile(id, fileId);
+		return ResponseEntity.noContent().build();
+	}
 }

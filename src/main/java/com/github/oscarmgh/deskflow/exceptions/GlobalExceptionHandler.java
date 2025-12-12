@@ -12,6 +12,9 @@ import com.github.oscarmgh.deskflow.exceptions.auth.EmailExistsException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InactiveUserException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InvalidCredentialsException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.CategoryNotFoundException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.FileDeleteNotAllowedException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.FileUploadNotAllowedException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.TicketFileNotFoundException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.TicketNotFoundException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.UnauthorizedTicketAccessException;
 
@@ -137,5 +140,41 @@ public class GlobalExceptionHandler {
 				OffsetDateTime.now());
 
 		return ResponseEntity.status(status).body(response);
+	}
+
+	@ExceptionHandler(TicketFileNotFoundException.class)
+	public ResponseEntity<ApiErrorResponse> handleGeneralException(
+			TicketFileNotFoundException ex,
+			HttpServletRequest request) {
+
+		return buildResponse(
+				HttpStatus.NOT_FOUND,
+				"FILE_NOT_FOUND",
+				ex.getMessage(),
+				request.getRequestURI());
+	}
+
+	@ExceptionHandler(FileUploadNotAllowedException.class)
+	public ResponseEntity<ApiErrorResponse> handleGeneralException(
+			FileUploadNotAllowedException ex,
+			HttpServletRequest request) {
+
+		return buildResponse(
+				HttpStatus.FORBIDDEN,
+				"UPLOAD_NOT_ALLOWED",
+				ex.getMessage(),
+				request.getRequestURI());
+	}
+
+	@ExceptionHandler(FileDeleteNotAllowedException.class)
+	public ResponseEntity<ApiErrorResponse> handleGeneralException(
+			FileDeleteNotAllowedException ex,
+			HttpServletRequest request) {
+
+		return buildResponse(
+				HttpStatus.FORBIDDEN,
+				"FILE_DELETE_NOT_ALLOWED",
+				ex.getMessage(),
+				request.getRequestURI());
 	}
 }

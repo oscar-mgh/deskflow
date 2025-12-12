@@ -20,17 +20,17 @@ public class CleanUpServiceImpl implements CleanUpService {
 		this.repository = repository;
 	}
 
-	@Scheduled(cron = "0 0 1 * * *")
+	@Scheduled(cron = "0 0 1 L * ?")
 	@Transactional
 	public void cleanupOldEntities() {
-		Instant sixMonthsAgo = Instant.now().minus(6, ChronoUnit.MONTHS);
+		Instant threeMonthsAgo = Instant.now().minus(3, ChronoUnit.MONTHS);
 		final int BATCH_SIZE = 1000;
 
 		int totalDeleted = 0;
 		List<Long> idsToDelete;
 
 		do {
-			idsToDelete = repository.findOldestIds(sixMonthsAgo, BATCH_SIZE);
+			idsToDelete = repository.findOldestIds(threeMonthsAgo, BATCH_SIZE);
 
 			if (!idsToDelete.isEmpty()) {
 

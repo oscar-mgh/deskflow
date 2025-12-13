@@ -3,6 +3,8 @@ package com.github.oscarmgh.deskflow.repositories;
 import java.time.Instant;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,9 +16,9 @@ import com.github.oscarmgh.deskflow.entities.User;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
-	List<Ticket> findByDemoTrue();
+	Page<Ticket> findByDemoTrue(Pageable pageable);
 
-	List<Ticket> findByUserAndDemoFalse(User user);
+	Page<Ticket> findByUserAndDemoFalse(User user, Pageable pageable);
 
 	List<Ticket> findByCategory(TicketCategory category);
 

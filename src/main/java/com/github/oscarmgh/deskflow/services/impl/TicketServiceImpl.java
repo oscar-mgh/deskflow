@@ -1,7 +1,7 @@
 package com.github.oscarmgh.deskflow.services.impl;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,11 +23,9 @@ public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
 
-    public List<TicketResponse> getDemoTickets() {
-        return ticketRepository.findByDemoTrue()
-                .stream()
-                .map(TicketResponse::new)
-                .toList();
+    public Page<TicketResponse> getDemoTickets(Pageable pageable) {
+        return ticketRepository.findByDemoTrue(pageable)
+                .map(TicketResponse::new);
     }
 
     public TicketResponse getDemoTicket(Long id) {
@@ -37,11 +35,9 @@ public class TicketServiceImpl implements TicketService {
         return new TicketResponse(ticket);
     }
 
-    public List<TicketResponse> getUserTickets(User user) {
-        return ticketRepository.findByUserAndDemoFalse(user)
-                .stream()
-                .map(TicketResponse::new)
-                .toList();
+    public Page<TicketResponse> getUserTickets(User user, Pageable pageable) {
+        return ticketRepository.findByUserAndDemoFalse(user, pageable)
+                .map(TicketResponse::new);
     }
 
     public TicketResponse createTicket(TicketRequest request, User user) {

@@ -1,7 +1,7 @@
 package com.github.oscarmgh.deskflow.controllers;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,20 +23,18 @@ import com.github.oscarmgh.deskflow.services.TicketService;
 import com.github.oscarmgh.deskflow.services.impl.TicketFileServiceImpl;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
-@Slf4j
 public class TicketController {
 
 	private final TicketService ticketService;
 	private final TicketFileServiceImpl fileService;
 
 	@GetMapping("/public/tickets")
-	public List<TicketResponse> demoTickets() {
-		return ticketService.getDemoTickets();
+	public Page<TicketResponse> demoTickets(Pageable pageable) {
+		return ticketService.getDemoTickets(pageable);
 	}
 
 	@GetMapping("/public/tickets/{id}")
@@ -51,9 +49,9 @@ public class TicketController {
 	}
 
 	@GetMapping("/tickets")
-	public List<TicketResponse> myTickets(Authentication authentication) {
+	public Page<TicketResponse> myTickets(Authentication authentication, Pageable pageable) {
 		User user = (User) authentication.getPrincipal();
-		return ticketService.getUserTickets(user);
+		return ticketService.getUserTickets(user, pageable);
 	}
 
 	@PostMapping("/tickets")

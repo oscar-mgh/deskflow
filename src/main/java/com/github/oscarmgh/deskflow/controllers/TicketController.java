@@ -1,5 +1,7 @@
 package com.github.oscarmgh.deskflow.controllers;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +17,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.github.oscarmgh.deskflow.dtos.ticket.AssignAgentRequest;
+import com.github.oscarmgh.deskflow.dtos.ticket.CommentRequest;
+import com.github.oscarmgh.deskflow.dtos.ticket.CommentResponse;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketFileResponse;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketResponse;
 import com.github.oscarmgh.deskflow.entities.User;
+import com.github.oscarmgh.deskflow.services.CommentService;
+import com.github.oscarmgh.deskflow.services.TicketFileService;
 import com.github.oscarmgh.deskflow.services.TicketService;
-import com.github.oscarmgh.deskflow.services.impl.TicketFileServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,17 +36,8 @@ import lombok.RequiredArgsConstructor;
 public class TicketController {
 
 	private final TicketService ticketService;
-	private final TicketFileServiceImpl fileService;
-
-	@GetMapping("/public/tickets")
-	public Page<TicketResponse> demoTickets(Pageable pageable) {
-		return ticketService.getDemoTickets(pageable);
-	}
-
-	@GetMapping("/public/tickets/{id}")
-	public TicketResponse demoTicket(@PathVariable Long id) {
-		return ticketService.getDemoTicket(id);
-	}
+	private final TicketFileService fileService;
+	private final CommentService commentService;
 
 	@GetMapping("/tickets/{id}")
 	public TicketResponse userTicket(@PathVariable Long id, Authentication authentication) {
@@ -92,5 +89,31 @@ public class TicketController {
 			@PathVariable Long fileId) {
 		fileService.deleteFile(id, fileId);
 		return ResponseEntity.noContent().build();
+	}
+
+	@PatchMapping("/admin/tickets/{id}/assign")
+	public TicketResponse assignAgent(
+			@PathVariable Long id,
+			@RequestBody AssignAgentRequest request,
+			Authentication authentication) {
+		User admin = (User) authentication.getPrincipal();
+		return ticketService.assignAgent(id, request.getAgentId(), admin);
+	}
+
+	@PostMapping("/tickets/{id}/comments")
+	public CommentResponse addComment(
+			@PathVariable Long id,
+			@RequestBody CommentRequest request,
+			Authentication authentication) {
+		User user = (User) authentication.getPrincipal();
+		return commentService.addComment(id, request, user);
+	}
+
+	@GetMapping("/tickets/{id}/comments")
+	public List<CommentResponse> getComments(
+			@PathVariable Long id,
+			Authentication authentication) {
+		User user = (User) authentication.getPrincipal();
+		return commentService.getComments(id, user);
 	}
 }

@@ -41,7 +41,7 @@ public class TicketFileServiceImpl implements TicketFileService {
 		}
 
 		Ticket ticket = ticketRepository.findById(ticketId)
-				.orElseThrow(() -> new TicketNotFoundException(ticketId.toString()));
+				.orElseThrow(TicketNotFoundException::new);
 
 		Map<String, Object> uploadResult = cloudinaryService.upload(file);
 

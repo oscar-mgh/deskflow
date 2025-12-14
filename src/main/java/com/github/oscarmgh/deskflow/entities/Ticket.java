@@ -55,8 +55,9 @@ public class Ticket {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@Column(name = "is_demo", nullable = false)
-	private Boolean demo;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "agent_id")
+	private User agent;
 
 	@Column(name = "created_at", nullable = false)
 	private OffsetDateTime createdAt;

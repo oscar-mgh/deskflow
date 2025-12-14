@@ -4,5 +4,6 @@ public enum UserRole {
 	GUEST,
 	USER,
 	PREMIUM,
+	AGENT,
 	ADMIN
 }

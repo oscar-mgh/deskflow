@@ -8,11 +8,6 @@ import com.github.oscarmgh.deskflow.dtos.ticket.TicketResponse;
 import com.github.oscarmgh.deskflow.entities.User;
 
 public interface TicketService {
-
-    Page<TicketResponse> getDemoTickets(Pageable pageable);
-
-    TicketResponse getDemoTicket(Long id);
-
     Page<TicketResponse> getUserTickets(User user, Pageable pageable);
 
     TicketResponse createTicket(TicketRequest request, User user);
@@ -24,4 +19,6 @@ public interface TicketService {
     TicketResponse updateTicket(Long id, TicketRequest request, User user);
 
     void deleteTicket(Long id, User user);
+
+    TicketResponse assignAgent(Long ticketId, Long agentId, User admin);
 }

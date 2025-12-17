@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.oscarmgh.deskflow.dtos.auth.LoginRequest;
 import com.github.oscarmgh.deskflow.dtos.auth.RegisterRequest;
-import com.github.oscarmgh.deskflow.dtos.auth.TokenResponse;
 import com.github.oscarmgh.deskflow.dtos.user.UserResponse;
 import com.github.oscarmgh.deskflow.entities.User;
 import com.github.oscarmgh.deskflow.services.AuthService;
@@ -28,15 +27,15 @@ public class AuthController {
 	private final TokenService tokenService;
 
 	@PostMapping("/login")
-	public TokenResponse login(@RequestBody LoginRequest request) {
+	public String login(@RequestBody LoginRequest request) {
 		return authService.login(request);
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<TokenResponse> register(
+	public ResponseEntity<String> register(
 			@RequestBody @Valid RegisterRequest request) {
 
-		TokenResponse token = authService.register(request);
+		String token = authService.register(request);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(token);

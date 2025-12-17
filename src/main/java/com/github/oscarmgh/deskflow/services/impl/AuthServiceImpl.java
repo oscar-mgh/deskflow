@@ -5,9 +5,8 @@ import org.springframework.stereotype.Service;
 
 import com.github.oscarmgh.deskflow.dtos.auth.LoginRequest;
 import com.github.oscarmgh.deskflow.dtos.auth.RegisterRequest;
-import com.github.oscarmgh.deskflow.dtos.auth.TokenResponse;
 import com.github.oscarmgh.deskflow.entities.User;
-import com.github.oscarmgh.deskflow.entities.UserToken;
+
 import com.github.oscarmgh.deskflow.entities.enums.UserRole;
 import com.github.oscarmgh.deskflow.exceptions.auth.EmailExistsException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InactiveUserException;
@@ -28,7 +27,7 @@ public class AuthServiceImpl implements AuthService {
 	private final TokenService tokenService;
 	private final PasswordEncoder passwordEncoder;
 
-	public TokenResponse login(LoginRequest request) {
+	public String login(LoginRequest request) {
 
 		User user = userRepository.findByEmail(request.getEmail()).orElse(null);
 
@@ -44,13 +43,11 @@ public class AuthServiceImpl implements AuthService {
 			throw new InactiveUserException();
 		}
 
-		UserToken token = tokenService.generateToken(user);
-
-		return new TokenResponse(token.getToken(), token.getExpiresAt());
+		return tokenService.generateToken(user);
 	}
 
 	@Transactional
-	public TokenResponse register(RegisterRequest request) {
+	public String register(RegisterRequest request) {
 
 		if (userRepository.findByEmail(request.getEmail()).isPresent()) {
 			throw new EmailExistsException();
@@ -66,12 +63,11 @@ public class AuthServiceImpl implements AuthService {
 
 		user = userRepository.save(user);
 
-		UserToken token = tokenService.generateToken(user);
-
-		return new TokenResponse(token);
+		return tokenService.generateToken(user);
 	}
 
 	public void logout(String token) {
-		tokenService.revokeToken(token);
+		// Stateless JWT: active revocation would require a blocklist/database
+		// For now, we rely on client-side discard + short expiration
 	}
 }

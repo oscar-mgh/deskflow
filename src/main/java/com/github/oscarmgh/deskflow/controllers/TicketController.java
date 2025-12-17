@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.github.oscarmgh.deskflow.dtos.PageResponse;
 import com.github.oscarmgh.deskflow.dtos.ticket.AssignAgentRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.CommentRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.CommentResponse;
@@ -46,7 +47,7 @@ public class TicketController {
 	}
 
 	@GetMapping("/tickets")
-	public Page<TicketResponse> myTickets(Authentication authentication, Pageable pageable) {
+	public PageResponse<TicketResponse> myTickets(Authentication authentication, Pageable pageable) {
 		User user = (User) authentication.getPrincipal();
 		return ticketService.getUserTickets(user, pageable);
 	}

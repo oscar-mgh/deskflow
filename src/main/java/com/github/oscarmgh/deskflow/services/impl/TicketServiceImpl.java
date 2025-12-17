@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.oscarmgh.deskflow.dtos.PageResponse;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketResponse;
 import com.github.oscarmgh.deskflow.entities.Ticket;
@@ -31,9 +32,19 @@ public class TicketServiceImpl implements TicketService {
     private final UserRepository userRepository;
 
     @Override
-    public Page<TicketResponse> getUserTickets(User user, Pageable pageable) {
-        return ticketRepository.findByUser(user, pageable)
+    public PageResponse<TicketResponse> getUserTickets(User user, Pageable pageable) {
+
+        Page<TicketResponse> page = ticketRepository.findByUser(user, pageable)
                 .map(TicketResponse::new);
+
+        return PageResponse.<TicketResponse>builder()
+                .content(page.getContent())
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .last(page.isLast())
+                .build();
     }
 
     @Override

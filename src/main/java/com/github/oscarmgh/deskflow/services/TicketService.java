@@ -1,14 +1,14 @@
 package com.github.oscarmgh.deskflow.services;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.github.oscarmgh.deskflow.dtos.PageResponse;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketResponse;
 import com.github.oscarmgh.deskflow.entities.User;
 
 public interface TicketService {
-    Page<TicketResponse> getUserTickets(User user, Pageable pageable);
+    PageResponse<TicketResponse> getUserTickets(User user, Pageable pageable);
 
     TicketResponse createTicket(TicketRequest request, User user);
 

@@ -1,77 +1,80 @@
 package com.github.oscarmgh.deskflow.services.impl;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.UUID;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.github.oscarmgh.deskflow.entities.User;
-import com.github.oscarmgh.deskflow.entities.UserToken;
-import com.github.oscarmgh.deskflow.repositories.UserTokenRepository;
+import com.github.oscarmgh.deskflow.repositories.UserRepository;
 import com.github.oscarmgh.deskflow.services.TokenService;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
 
-	private final UserTokenRepository tokenRepository;
+	@Value("${jwt.secret}")
+	private String secretKey;
 
-	@Value("${app.security.token-expiration-hours}")
-	private long tokenExpirationHours;
+	@Value("${jwt.expiration}")
+	private long jwtExpiration;
 
-	public UserToken generateToken(User user) {
+	private final UserRepository userRepository;
 
-		OffsetDateTime nowUtc = OffsetDateTime.now(ZoneOffset.UTC);
-
-		UserToken token = UserToken.builder()
-				.token(generateRandomToken())
-				.user(user)
-				.expiresAt(
-						nowUtc.plusHours(tokenExpirationHours))
-				.revoked(false)
-				.build();
-
-		return tokenRepository.save(token);
+	@Override
+	public String generateToken(User user) {
+		return buildToken(user, jwtExpiration);
 	}
 
-	public boolean isValid(String tokenValue) {
-
-		OffsetDateTime nowUtc = OffsetDateTime.now(ZoneOffset.UTC);
-
-		return tokenRepository
-				.findByTokenAndRevokedFalse(tokenValue)
-				.filter(token -> token.getExpiresAt().isAfter(nowUtc))
-				.isPresent();
+	private String buildToken(User user, long expiration) {
+		return Jwts.builder()
+				.setSubject(user.getEmail())
+				.setIssuedAt(new Date(System.currentTimeMillis()))
+				.setExpiration(new Date(System.currentTimeMillis() + expiration))
+				.signWith(getSignInKey(), SignatureAlgorithm.HS256)
+				.compact();
 	}
 
-	public User getUserFromToken(String tokenValue) {
-
-		OffsetDateTime nowUtc = OffsetDateTime.now(ZoneOffset.UTC);
-
-		return tokenRepository
-				.findByTokenAndRevokedFalse(tokenValue)
-				.filter(token -> token.getExpiresAt().isAfter(nowUtc))
-				.map(UserToken::getUser)
-				.orElse(null);
+	@Override
+	public boolean isValid(String token) {
+		try {
+			extractAllClaims(token);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
-	@Transactional
-	public void revokeToken(String tokenValue) {
-		UserToken token = tokenRepository.findByTokenAndRevokedFalse(tokenValue)
-				.orElseThrow(() -> new RuntimeException("Token not found or already revoked"));
-
-		token.setRevoked(true);
-		tokenRepository.save(token);
+	@Override
+	public User getUserFromToken(String token) {
+		try {
+			String email = extractAllClaims(token).getSubject();
+			return userRepository.findByEmail(email).orElse(null);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
-	private String generateRandomToken() {
-		return UUID.randomUUID()
-				.toString()
-				.replace("-", "");
+	private Claims extractAllClaims(String token) {
+		return Jwts.parserBuilder()
+				.setSigningKey(getSignInKey())
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
+	}
+
+	private Key getSignInKey() {
+		return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 	}
 }

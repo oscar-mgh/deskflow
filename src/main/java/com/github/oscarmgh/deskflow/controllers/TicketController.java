@@ -1,8 +1,8 @@
 package com.github.oscarmgh.deskflow.controllers;
 
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,9 +25,12 @@ import com.github.oscarmgh.deskflow.dtos.ticket.TicketFileResponse;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketResponse;
 import com.github.oscarmgh.deskflow.entities.User;
+import com.github.oscarmgh.deskflow.entities.enums.UserRole;
+import com.github.oscarmgh.deskflow.repositories.UserRepository;
 import com.github.oscarmgh.deskflow.services.CommentService;
 import com.github.oscarmgh.deskflow.services.TicketFileService;
 import com.github.oscarmgh.deskflow.services.TicketService;
+import com.github.oscarmgh.deskflow.services.TokenService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +42,8 @@ public class TicketController {
 	private final TicketService ticketService;
 	private final TicketFileService fileService;
 	private final CommentService commentService;
+	private final UserRepository userRepository;
+	private final TokenService tokenService;
 
 	@GetMapping("/tickets/{id}")
 	public TicketResponse userTicket(@PathVariable Long id, Authentication authentication) {
@@ -116,5 +121,18 @@ public class TicketController {
 			Authentication authentication) {
 		User user = (User) authentication.getPrincipal();
 		return commentService.getComments(id, user);
+	}
+
+	@PostMapping("/upgrade")
+	public ResponseEntity<Map<String, String>> upgrade(Authentication authentication) {
+		String email = authentication.getName();
+
+		userRepository.updateRole(email, UserRole.PREMIUM);
+
+		User updated = userRepository.findByEmail(email).get();
+
+		String newToken = tokenService.generateToken(updated);
+
+		return ResponseEntity.ok(Map.of("token", newToken));
 	}
 }

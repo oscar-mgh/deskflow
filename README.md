@@ -13,18 +13,19 @@ DeskFlow API es un servicio backend RESTful robusto diseñado para la gestión i
 #### Autenticación y Seguridad
 
 - **Autenticación JWT**: Uso de JSON Web Tokens (Stateless) para la autenticación segura
-- **Control de acceso basado en roles (RBAC)**: Sistema de permisos con 4 roles diferentes
+- **Control de acceso basado en roles (RBAC)**: Sistema de permisos con 5 roles diferentes (GUEST, USER, PREMIUM, AGENT, ADMIN)
 - **Expiración de tokens**: Configurable mediante propiedades (default 24 horas)
 - **Seguridad stateless**: No requiere almacenamiento de sesión en servidor
 - **Encriptación de contraseñas**: Uso de BCrypt para hash seguro de contraseñas
 
 #### Gestión de Tickets
 
-- **Ciclo de vida completo**: Creación, actualización, consulta y eliminación de tickets
-- **Estados de tickets**: `OPEN`, `IN_PROGRESS`, `CLOSED`, `RESOLVED`
-- **Prioridades**: `LOW`, `MEDIUM`, `HIGH`, `CRITICAL`
-- **Categorización**: Organización de tickets por categorías personalizables
-- **Tickets de demostración**: Acceso público a tickets de ejemplo sin autenticación
+- **Ciclo de vida completo**: Creación, actualización, consulta y eliminación de tickets.
+- **Asignación Automática**: Los tickets se asignan automáticamente al "Mejor Agente Disponible" (menor carga de trabajo) al momento de su creación.
+- **Estados de tickets**: `OPEN`, `IN_PROGRESS`, `CLOSED`, `RESOLVED`.
+- **Prioridades**: `LOW`, `MEDIUM`, `HIGH`, `CRITICAL`.
+- **Categorización**: Organización de tickets por categorías personalizables.
+- **Tickets de demostración**: Acceso público a tickets de ejemplo sin autenticación.
 
 #### Gestión de Archivos
 
@@ -192,17 +193,24 @@ Una vez iniciada, la API estará disponible en:
 
 ### Roles y Permisos
 
-La aplicación implementa 4 roles con diferentes niveles de acceso:
+La aplicación implementa 5 roles con diferentes niveles de acceso para garantizar una gestión eficiente:
 
-- **USER**: Usuario estándar
-  - Puede crear, ver, actualizar y eliminar sus propios tickets
-  - No puede subir archivos adjuntos
-- **PREMIUM**: Usuario premium
-  - Todas las capacidades de USER
-  - Puede subir y eliminar archivos adjuntos en tickets
-- **ADMIN**: Administrador
-  - Acceso completo a todas las funcionalidades
-  - Puede subir y eliminar archivos adjuntos
+| Rol | Descripción | Capacidades Clave |
+| :--- | :--- | :--- |
+| **GUEST** | Usuario no autenticado | Puede ver los tickets de demostración y el listado de categorías. |
+| **USER** | Usuario estándar | Puede crear, ver y gestionar sus propios tickets. No tiene acceso a archivos adjuntos. |
+| **PREMIUM** | Usuario con beneficios | Todas las funciones de USER + **Gestión de archivos adjuntos** (subida y eliminación) para mayor detalle en sus reportes. |
+| **AGENT** | Personal de soporte | Puede gestionar, comentar y resolver los tickets que tiene asignados. |
+| **ADMIN** | Administrador | Control total del sistema, incluyendo la asignación manual de agentes a cualquier ticket. |
+
+### Sistema de Asignación de Agentes
+
+El flujo de asignación está diseñado para maximizar la velocidad de respuesta:
+
+1.  **Asignación Equitativa**: No existe una distinción en la cola de agentes entre usuarios `USER` y `PREMIUM`. Ambos reciben atención de los mismos agentes capacitados.
+2.  **Criterio de Carga**: El sistema busca automáticamente al agente con el menor número de tickets en estado `OPEN` para balancear el trabajo.
+3.  **Transparencia**: El usuario puede ver quién es su agente asignado en todo momento desde el detalle del ticket.
+4.  **Asignación Manual**: Los administradores pueden reasignar tickets si un caso requiere un experto específico o para ajustar cargas de trabajo críticas.
 
 ### Endpoints Públicos vs Protegidos
 

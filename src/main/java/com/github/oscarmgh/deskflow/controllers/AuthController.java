@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.oscarmgh.deskflow.dtos.auth.AuthResponse;
 import com.github.oscarmgh.deskflow.dtos.auth.LoginRequest;
 import com.github.oscarmgh.deskflow.dtos.auth.RegisterRequest;
 import com.github.oscarmgh.deskflow.dtos.user.UserResponse;
@@ -27,23 +28,18 @@ public class AuthController {
 	private final TokenService tokenService;
 
 	@PostMapping("/login")
-	public String login(@RequestBody LoginRequest request) {
+	public AuthResponse login(@RequestBody LoginRequest request) {
 		return authService.login(request);
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<String> register(
+	public ResponseEntity<AuthResponse> register(
 			@RequestBody @Valid RegisterRequest request) {
 
-		String token = authService.register(request);
+		AuthResponse response = authService.register(request);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(token);
-	}
-
-	@GetMapping("/logout")
-	public void logout(@RequestHeader("Authorization") String token) {
-		authService.logout(token);
+				.body(response);
 	}
 
 	@GetMapping("/validate")

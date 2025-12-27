@@ -3,6 +3,7 @@ package com.github.oscarmgh.deskflow.services.impl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.github.oscarmgh.deskflow.dtos.auth.AuthResponse;
 import com.github.oscarmgh.deskflow.dtos.auth.LoginRequest;
 import com.github.oscarmgh.deskflow.dtos.auth.RegisterRequest;
 import com.github.oscarmgh.deskflow.entities.User;
@@ -27,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
 	private final TokenService tokenService;
 	private final PasswordEncoder passwordEncoder;
 
-	public String login(LoginRequest request) {
+	public AuthResponse login(LoginRequest request) {
 
 		User user = userRepository.findByEmail(request.getEmail()).orElse(null);
 
@@ -43,11 +44,11 @@ public class AuthServiceImpl implements AuthService {
 			throw new InactiveUserException();
 		}
 
-		return tokenService.generateToken(user);
+		return AuthResponse.builder().token(tokenService.generateToken(user)).build();
 	}
 
 	@Transactional
-	public String register(RegisterRequest request) {
+	public AuthResponse register(RegisterRequest request) {
 
 		if (userRepository.findByEmail(request.getEmail()).isPresent()) {
 			throw new EmailExistsException();
@@ -63,11 +64,6 @@ public class AuthServiceImpl implements AuthService {
 
 		user = userRepository.save(user);
 
-		return tokenService.generateToken(user);
-	}
-
-	public void logout(String token) {
-		// Stateless JWT: active revocation would require a blocklist/database
-		// For now, we rely on client-side discard + short expiration
+		return AuthResponse.builder().token(tokenService.generateToken(user)).build();
 	}
 }

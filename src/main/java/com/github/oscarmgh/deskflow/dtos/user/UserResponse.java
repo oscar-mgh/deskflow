@@ -13,6 +13,7 @@ public class UserResponse {
 	private Long id;
 	private String fullName;
 	private String email;
+	private String company;
 	private UserRole role;
 	private Boolean active;
 
@@ -20,6 +21,7 @@ public class UserResponse {
 		this.id = user.getId();
 		this.fullName = user.getFullName();
 		this.email = user.getEmail();
+		this.company = user.getCompany();
 		this.role = user.getRole();
 		this.active = user.getActive();
 	}

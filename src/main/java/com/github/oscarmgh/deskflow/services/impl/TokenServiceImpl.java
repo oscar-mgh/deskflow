@@ -40,7 +40,10 @@ public class TokenServiceImpl implements TokenService {
 
 	private String buildToken(User user, long expiration) {
 		return Jwts.builder()
-				.setClaims(Map.of("role", user.getRole().name(), "username", user.getFullName()))
+				.setClaims(Map.of(
+						"role", user.getRole().name(),
+						"username", user.getFullName(),
+						"company", user.getCompany()))
 				.setSubject(user.getEmail())
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + expiration))

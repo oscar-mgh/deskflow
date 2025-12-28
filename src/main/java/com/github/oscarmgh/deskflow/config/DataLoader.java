@@ -43,6 +43,7 @@ public class DataLoader implements CommandLineRunner {
                                 .fullName("Normal User")
                                 .email("user@deskflow.com")
                                 .password("$2a$10$3ryoqEbtjZxZdx.YfNpIPeGVn0YDn9lYdeuAQ48gErtLvOMkY4viC")
+                                .company("Nestle")
                                 .role(UserRole.USER)
                                 .active(true)
                                 .build();
@@ -51,6 +52,7 @@ public class DataLoader implements CommandLineRunner {
                                 .fullName("Premium User")
                                 .email("premium@deskflow.com")
                                 .password("$2a$10$09VqrCJOImEiWBxLX8e5YukoHmdEg1j7m96x.jicF04sX9hYPMxYi")
+                                .company("Facebook")
                                 .role(UserRole.PREMIUM)
                                 .active(true)
                                 .build();
@@ -59,6 +61,7 @@ public class DataLoader implements CommandLineRunner {
                                 .fullName("Agent User")
                                 .email("agent@deskflow.com")
                                 .password("$2a$10$EqytgvWVtWYICmg5sIBl4uKt3IuVbfmFs.NYR.d9BMj/VdwjTn4va")
+                                .company("Amazon")
                                 .role(UserRole.AGENT)
                                 .active(true)
                                 .build();
@@ -66,7 +69,8 @@ public class DataLoader implements CommandLineRunner {
                 User admin = User.builder()
                                 .fullName("Admin User")
                                 .email("admin@deskflow.com")
-                                .password("$2a$10$YKv.GUUAlTkRgk7BPRbtkOcoYGuWwshSloNiGMMC3gkuyIApPadAG")
+                                .password("$2a$12$hGIvd.HeqZaEO0AsAoFoi.xalyEmC/HoH/72KMjZOVTFZTbrIMjji")
+                                .company("DeskFlow")
                                 .role(UserRole.ADMIN)
                                 .active(true)
                                 .build();
@@ -76,6 +80,7 @@ public class DataLoader implements CommandLineRunner {
                 tokenService.generateToken(normal);
                 tokenService.generateToken(premium);
                 tokenService.generateToken(admin);
+                tokenService.generateToken(agent);
 
                 System.out.println("Users created for DEV profile!");
 
@@ -226,7 +231,7 @@ public class DataLoader implements CommandLineRunner {
                                                 .title("No recibo respuesta del chat")
                                                 .description("El chat de soporte no responde")
                                                 .status(TicketStatus.OPEN)
-                                                .priority(TicketPriority.MEDIUM)
+                                                .priority(TicketPriority.LOW)
                                                 .category(supportCategory)
                                                 .user(premium)
                                                 .build(),
@@ -252,7 +257,15 @@ public class DataLoader implements CommandLineRunner {
                                                 .description("El filtro por fecha no aplica correctamente")
                                                 .status(TicketStatus.IN_PROGRESS)
                                                 .agent(agent)
-                                                .priority(TicketPriority.HIGH)
+                                                .priority(TicketPriority.CRITICAL)
+                                                .user(premium)
+                                                .category(featureCategory)
+                                                .build(),
+                                Ticket.builder()
+                                                .title("No puedo entrar al SAP, me da error de credenciales.")
+                                                .description("Hola, estoy intentando entrar para cerrar el mes y me sale el mensaje 'Error de autenticación: Usuario bloqueado' He intentado restablecer la contraseña pero no me llega el correo.")
+                                                .status(TicketStatus.OPEN)
+                                                .priority(TicketPriority.CRITICAL)
                                                 .user(premium)
                                                 .category(featureCategory)
                                                 .build()));

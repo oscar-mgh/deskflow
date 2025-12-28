@@ -2,10 +2,12 @@ package com.github.oscarmgh.deskflow.entities;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import com.github.oscarmgh.deskflow.entities.enums.TicketPriority;
 import com.github.oscarmgh.deskflow.entities.enums.TicketStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,6 +18,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -62,9 +65,12 @@ public class Ticket {
 	@Column(name = "created_at", nullable = false)
 	private OffsetDateTime createdAt;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "category_id")
 	private TicketCategory category;
+
+	@OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Comment> comments;
 
 	@PrePersist
 	protected void onCreate() {

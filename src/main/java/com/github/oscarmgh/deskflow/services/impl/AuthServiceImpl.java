@@ -60,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
 				.password(passwordEncoder.encode(request.getPassword()))
 				.role(UserRole.USER)
 				.active(true)
+				.company(request.getCompany())
 				.build();
 
 		user = userRepository.save(user);

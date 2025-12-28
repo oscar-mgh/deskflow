@@ -17,6 +17,7 @@ public class TicketResponse {
 	private String status;
 	private String priority;
 	private Long agentId;
+	private String categoryName;
 
 	private OffsetDateTime createdAt;
 
@@ -30,6 +31,10 @@ public class TicketResponse {
 
 		this.agentId = ticket.getAgent() != null
 				? ticket.getAgent().getId()
+				: null;
+
+		this.categoryName = ticket.getCategory() != null
+				? ticket.getCategory().getName()
 				: null;
 	}
 }

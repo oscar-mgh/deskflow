@@ -1,6 +1,8 @@
 package com.github.oscarmgh.deskflow.services.impl;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -55,6 +57,13 @@ public class TicketFileServiceImpl implements TicketFileService {
 		TicketFile saved = ticketFileRepository.save(ticketFile);
 
 		return TicketFileMapper.toResponse(saved);
+	}
+
+	public List<TicketFileResponse> getFiles(Long ticketId) {
+		return ticketFileRepository.findByTicketId(ticketId)
+				.stream()
+				.map(TicketFileMapper::toResponse)
+				.collect(Collectors.toList());
 	}
 
 	public void deleteFile(Long ticketId, Long fileId) {

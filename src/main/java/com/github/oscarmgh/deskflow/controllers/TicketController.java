@@ -82,6 +82,11 @@ public class TicketController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@GetMapping("/tickets/{id}/files")
+	public List<TicketFileResponse> getFiles(@PathVariable Long id) {
+		return fileService.getFiles(id);
+	}
+
 	@PostMapping(value = "/tickets/{id}/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<TicketFileResponse> uploadFile(
 			@PathVariable Long id,

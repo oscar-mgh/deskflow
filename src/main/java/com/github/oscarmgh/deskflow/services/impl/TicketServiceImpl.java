@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class TicketServiceImpl implements TicketService {
-
     private final TicketRepository ticketRepository;
     private final AgentService agentService;
     private final UserRepository userRepository;
@@ -136,7 +135,7 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(UserNotFoundException::new);
 
         if (agent.getRole() != UserRole.AGENT) {
-            throw new IllegalStateException("El usuario seleccionado no es un agente");
+            throw new IllegalStateException("The selected user is not an agent");
         }
 
         ticket.setAgent(agent);
@@ -155,7 +154,7 @@ public class TicketServiceImpl implements TicketService {
             case AGENT:
                 if (ticket.getAgent() != null &&
                         ticket.getAgent().getId().equals(user.getId())) {
-                    return; // agente asignado
+                    return;
                 }
                 throw new TicketNotFoundException();
 
@@ -163,7 +162,7 @@ public class TicketServiceImpl implements TicketService {
             case PREMIUM:
                 if (ticket.getUser() != null &&
                         ticket.getUser().getId().equals(user.getId())) {
-                    return; // dueño del ticket
+                    return;
                 }
                 throw new TicketNotFoundException();
 

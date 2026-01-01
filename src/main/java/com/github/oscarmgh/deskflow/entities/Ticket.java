@@ -67,7 +67,7 @@ public class Ticket {
 	private User agent;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "category_id", nullable = false)
+	@JoinColumn(name = "category_id")
 	private TicketCategory category;
 
 	@OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -82,14 +82,9 @@ public class Ticket {
 	@Column(name = "closed_at")
 	private OffsetDateTime closedAt;
 
-	@Column(name = "due_date")
-	private OffsetDateTime dueDate;
-
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = OffsetDateTime.now(ZoneOffset.UTC);
-		this.updatedAt = this.createdAt;
-
 		if (this.code == null) {
 			this.code = "TK-" + System.currentTimeMillis() % 100000;
 		}

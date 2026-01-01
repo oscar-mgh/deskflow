@@ -37,9 +37,9 @@ public class SecurityConfig {
 				.httpBasic(basic -> basic.disable())
 				.formLogin(form -> form.disable())
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/auth/**").permitAll()
-						.requestMatchers("/public/**").permitAll()
-						.requestMatchers("/categories", "/categories/**").permitAll()
+						.requestMatchers("/api/v1/auth/**").permitAll()
+						.requestMatchers("/api/v1/public/**").permitAll()
+						.requestMatchers("/api/v1/categories", "/api/v1/categories/**").permitAll()
 						.anyRequest().authenticated())
 				.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();

@@ -20,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +41,9 @@ public class Ticket {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(unique = true, length = 20)
+	private String code;
+
 	@Column(nullable = false)
 	private String title;
 
@@ -55,25 +59,48 @@ public class Ticket {
 	private TicketPriority priority;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "agent_id")
 	private User agent;
 
-	@Column(name = "created_at", nullable = false)
-	private OffsetDateTime createdAt;
-
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "category_id")
+	@JoinColumn(name = "category_id", nullable = false)
 	private TicketCategory category;
 
-	@OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Comment> comments;
+	@OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Comment> comments;
+
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private OffsetDateTime createdAt;
+
+	@Column(name = "updated_at")
+	private OffsetDateTime updatedAt;
+
+	@Column(name = "closed_at")
+	private OffsetDateTime closedAt;
+
+	@Column(name = "due_date")
+	private OffsetDateTime dueDate;
 
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = OffsetDateTime.now(ZoneOffset.UTC);
+		this.updatedAt = this.createdAt;
+
+		if (this.code == null) {
+			this.code = "TK-" + System.currentTimeMillis() % 100000;
+		}
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		this.updatedAt = OffsetDateTime.now(ZoneOffset.UTC);
+
+		if (this.status == TicketStatus.RESOLVED || this.status == TicketStatus.CLOSED) {
+			this.closedAt = OffsetDateTime.now(ZoneOffset.UTC);
+		}
 	}
 }

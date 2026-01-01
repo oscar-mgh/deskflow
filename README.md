@@ -13,7 +13,7 @@ DeskFlow API es un servicio backend RESTful robusto diseñado para la gestión i
 #### Autenticación y Seguridad
 
 - **Autenticación JWT**: Uso de JSON Web Tokens (Stateless) para la autenticación segura
-- **Control de acceso basado en roles (RBAC)**: Sistema de permisos con 5 roles diferentes (GUEST, USER, PREMIUM, AGENT, ADMIN)
+- **Control de acceso basado en roles (RBAC)**: Sistema de permisos con 4 roles diferentes (USER, PREMIUM, AGENT, ADMIN)
 - **Expiración de tokens**: Configurable mediante propiedades (default 24 horas)
 - **Seguridad stateless**: No requiere almacenamiento de sesión en servidor
 - **Encriptación de contraseñas**: Uso de BCrypt para hash seguro de contraseñas
@@ -193,11 +193,10 @@ Una vez iniciada, la API estará disponible en:
 
 ### Roles y Permisos
 
-La aplicación implementa 5 roles con diferentes niveles de acceso para garantizar una gestión eficiente:
+La aplicación implementa 4 roles con diferentes niveles de acceso para garantizar una gestión eficiente:
 
 | Rol | Descripción | Capacidades Clave |
 | :--- | :--- | :--- |
-| **GUEST** | Usuario no autenticado | Puede ver los tickets de demostración y el listado de categorías. |
 | **USER** | Usuario estándar | Puede crear, ver y gestionar sus propios tickets. No tiene acceso a archivos adjuntos. |
 | **PREMIUM** | Usuario con beneficios | Todas las funciones de USER + **Gestión de archivos adjuntos** (subida y eliminación) para mayor detalle en sus reportes. |
 | **AGENT** | Personal de soporte | Puede gestionar, comentar y resolver los tickets que tiene asignados. |

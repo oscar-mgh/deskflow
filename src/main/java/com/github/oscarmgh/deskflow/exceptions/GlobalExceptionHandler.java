@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.github.oscarmgh.deskflow.exceptions.auth.EmailExistsException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InactiveUserException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InvalidCredentialsException;
-import com.github.oscarmgh.deskflow.exceptions.tickets.CategoryNotFoundException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.FileDeleteNotAllowedException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.FileUploadNotAllowedException;
-import com.github.oscarmgh.deskflow.exceptions.tickets.TicketFileNotFoundException;
-import com.github.oscarmgh.deskflow.exceptions.tickets.TicketNotFoundException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.ResourceNotFoundException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.UnauthorizedTicketAccessException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,30 +33,6 @@ public class GlobalExceptionHandler {
 				request.getRequestURI());
 	}
 
-	@ExceptionHandler(CategoryNotFoundException.class)
-	public ResponseEntity<ApiErrorResponse> handleTicketNotFound(
-			CategoryNotFoundException ex,
-			HttpServletRequest request) {
-
-		return buildResponse(
-				HttpStatus.NOT_FOUND,
-				"CATEGORY_NOT_FOUND",
-				ex.getMessage(),
-				request.getRequestURI());
-	}
-
-	@ExceptionHandler(TicketNotFoundException.class)
-	public ResponseEntity<ApiErrorResponse> handleTicketNotFound(
-			TicketNotFoundException ex,
-			HttpServletRequest request) {
-
-		return buildResponse(
-				HttpStatus.NOT_FOUND,
-				"TICKET_NOT_FOUND",
-				ex.getMessage(),
-				request.getRequestURI());
-	}
-
 	@ExceptionHandler(UnauthorizedTicketAccessException.class)
 	public ResponseEntity<ApiErrorResponse> handleUnauthorizedTicketAccess(
 			UnauthorizedTicketAccessException ex,
@@ -71,6 +45,20 @@ public class GlobalExceptionHandler {
 				request.getRequestURI());
 	}
 
+	@ExceptionHandler({
+			ResourceNotFoundException.class,
+	})
+	public ResponseEntity<ApiErrorResponse> handleNotFound(
+			RuntimeException ex,
+			HttpServletRequest request) {
+
+		return buildResponse(
+				HttpStatus.NOT_FOUND,
+				"RESOURCE_NOT_FOUND",
+				ex.getMessage(),
+				request.getRequestURI());
+	}
+
 	@ExceptionHandler(EmailExistsException.class)
 	public ResponseEntity<ApiErrorResponse> handleEmailAlreadyExists(
 			EmailExistsException ex,
@@ -78,7 +66,7 @@ public class GlobalExceptionHandler {
 
 		return buildResponse(
 				HttpStatus.CONFLICT,
-				"EMAIL_ALREADY_REGISTERED",
+				"EMAIL_REGISTERED",
 				ex.getMessage(),
 				request.getRequestURI());
 	}
@@ -140,18 +128,6 @@ public class GlobalExceptionHandler {
 				OffsetDateTime.now());
 
 		return ResponseEntity.status(status).body(response);
-	}
-
-	@ExceptionHandler(TicketFileNotFoundException.class)
-	public ResponseEntity<ApiErrorResponse> handleGeneralException(
-			TicketFileNotFoundException ex,
-			HttpServletRequest request) {
-
-		return buildResponse(
-				HttpStatus.NOT_FOUND,
-				"FILE_NOT_FOUND",
-				ex.getMessage(),
-				request.getRequestURI());
 	}
 
 	@ExceptionHandler(FileUploadNotAllowedException.class)

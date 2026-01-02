@@ -16,8 +16,7 @@ import com.github.oscarmgh.deskflow.entities.enums.TicketFile;
 import com.github.oscarmgh.deskflow.entities.enums.UserRole;
 import com.github.oscarmgh.deskflow.exceptions.tickets.FileDeleteNotAllowedException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.FileUploadNotAllowedException;
-import com.github.oscarmgh.deskflow.exceptions.tickets.TicketFileNotFoundException;
-import com.github.oscarmgh.deskflow.exceptions.tickets.TicketNotFoundException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.ResourceNotFoundException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.UnauthorizedTicketAccessException;
 import com.github.oscarmgh.deskflow.repositories.TicketFileRepository;
 import com.github.oscarmgh.deskflow.repositories.TicketRepository;
@@ -43,7 +42,7 @@ public class TicketFileServiceImpl implements TicketFileService {
 		}
 
 		Ticket ticket = ticketRepository.findById(ticketId)
-				.orElseThrow(TicketNotFoundException::new);
+				.orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
 
 		Map<String, Object> uploadResult = cloudinaryService.upload(file);
 
@@ -79,7 +78,7 @@ public class TicketFileServiceImpl implements TicketFileService {
 		}
 
 		TicketFile file = ticketFileRepository.findById(fileId)
-				.orElseThrow(TicketFileNotFoundException::new);
+				.orElseThrow(() -> new ResourceNotFoundException("TicketFile", fileId));
 
 		if (!file.getTicket().getId().equals(ticketId)) {
 			throw new UnauthorizedTicketAccessException();

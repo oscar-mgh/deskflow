@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketCategoryRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketCategoryResponse;
 import com.github.oscarmgh.deskflow.entities.TicketCategory;
-import com.github.oscarmgh.deskflow.exceptions.tickets.CategoryNotFoundException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.ResourceNotFoundException;
 import com.github.oscarmgh.deskflow.repositories.TicketCategoryRepository;
 import com.github.oscarmgh.deskflow.services.TicketCategoryService;
 
@@ -51,21 +51,21 @@ public class TicketCategoryServiceImpl implements TicketCategoryService {
     @Override
     public TicketCategoryResponse getCategoryById(Long id) {
         TicketCategory category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException(id.toString()));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", id));
         return new TicketCategoryResponse(category);
     }
 
     @Override
     public TicketCategoryResponse getCategoryByName(String name) {
         TicketCategory category = categoryRepository.findByName(name)
-                .orElseThrow(() -> new CategoryNotFoundException(name));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", name));
         return new TicketCategoryResponse(category);
     }
 
     @Override
     public void deleteCategory(Long id) {
         TicketCategory category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException(id.toString()));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", id));
         categoryRepository.delete(category);
     }
 }

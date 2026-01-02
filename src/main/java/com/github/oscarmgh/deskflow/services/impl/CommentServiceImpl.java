@@ -6,7 +6,8 @@ import com.github.oscarmgh.deskflow.entities.Comment;
 import com.github.oscarmgh.deskflow.entities.Ticket;
 import com.github.oscarmgh.deskflow.entities.User;
 import com.github.oscarmgh.deskflow.entities.enums.UserRole;
-import com.github.oscarmgh.deskflow.exceptions.tickets.TicketNotFoundException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.ResourceNotFoundException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.UnauthorizedTicketAccessException;
 import com.github.oscarmgh.deskflow.repositories.CommentRepository;
 import com.github.oscarmgh.deskflow.repositories.TicketRepository;
 import com.github.oscarmgh.deskflow.services.CommentService;
@@ -26,7 +27,7 @@ public class CommentServiceImpl implements CommentService {
 	public CommentResponse addComment(Long ticketId, CommentRequest request, User user) {
 
 		Ticket ticket = ticketRepository.findById(ticketId)
-				.orElseThrow(TicketNotFoundException::new);
+				.orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
 
 		boolean isOwner = ticket.getUser().getId().equals(user.getId());
 		boolean isAgent = ticket.getAgent() != null &&
@@ -34,7 +35,7 @@ public class CommentServiceImpl implements CommentService {
 		boolean isAdmin = user.getRole() == UserRole.ADMIN;
 
 		if (!isOwner && !isAgent && !isAdmin) {
-			throw new TicketNotFoundException();
+			throw new UnauthorizedTicketAccessException();
 		}
 
 		Comment comment = new Comment();
@@ -50,7 +51,7 @@ public class CommentServiceImpl implements CommentService {
 	public List<CommentResponse> getComments(Long ticketId, User user) {
 
 		Ticket ticket = ticketRepository.findById(ticketId)
-				.orElseThrow(TicketNotFoundException::new);
+				.orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
 
 		boolean isOwner = ticket.getUser().getId().equals(user.getId());
 		boolean isAgent = ticket.getAgent() != null &&
@@ -58,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
 		boolean isAdmin = user.getRole() == UserRole.ADMIN;
 
 		if (!isOwner && !isAgent && !isAdmin) {
-			throw new TicketNotFoundException();
+			throw new UnauthorizedTicketAccessException();
 		}
 
 		return commentRepository.findByTicketOrderByCreatedAtAsc(ticket)

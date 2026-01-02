@@ -8,4 +8,6 @@ import com.github.oscarmgh.deskflow.entities.TicketCategory;
 
 public interface TicketCategoryRepository extends JpaRepository<TicketCategory, Long> {
 	Optional<TicketCategory> findByName(String name);
+
+	Optional<TicketCategory> findById(Long id);
 }

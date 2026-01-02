@@ -9,12 +9,12 @@ import com.github.oscarmgh.deskflow.dtos.PageResponse;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketRequest;
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketResponse;
 import com.github.oscarmgh.deskflow.entities.Ticket;
+import com.github.oscarmgh.deskflow.entities.TicketCategory;
 import com.github.oscarmgh.deskflow.entities.User;
-import com.github.oscarmgh.deskflow.entities.enums.TicketStatus;
 import com.github.oscarmgh.deskflow.entities.enums.UserRole;
-import com.github.oscarmgh.deskflow.exceptions.auth.UserNotFoundException;
-import com.github.oscarmgh.deskflow.exceptions.tickets.TicketNotFoundException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.ResourceNotFoundException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.UnauthorizedTicketAccessException;
+import com.github.oscarmgh.deskflow.repositories.TicketCategoryRepository;
 import com.github.oscarmgh.deskflow.repositories.TicketRepository;
 import com.github.oscarmgh.deskflow.repositories.UserRepository;
 import com.github.oscarmgh.deskflow.services.AgentService;
@@ -29,6 +29,7 @@ public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
     private final AgentService agentService;
     private final UserRepository userRepository;
+    private final TicketCategoryRepository ticketCategoryRepository;
 
     @Override
     public PageResponse<TicketResponse> getUserTickets(User user, Pageable pageable) {
@@ -49,6 +50,8 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketResponse createTicket(TicketRequest request, User user) {
         User agent = agentService.findBestAvailableAgent();
+        TicketCategory ticketCategory = ticketCategoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("TicketCategory", request.getCategoryId()));
 
         if (agent == null) {
             throw new IllegalStateException("No agents available");
@@ -57,10 +60,10 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = Ticket.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .status(TicketStatus.OPEN)
                 .priority(request.getPriority())
                 .user(user)
                 .agent(agent)
+                .category(ticketCategory)
                 .build();
 
         Ticket saved = ticketRepository.save(ticket);
@@ -70,14 +73,14 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketResponse getById(Long id) {
         Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(TicketNotFoundException::new);
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
         return new TicketResponse(ticket);
     }
 
     @Override
     public TicketResponse getUserTicket(Long id, User user) {
         Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(TicketNotFoundException::new);
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
 
         authorizeTicketAccess(ticket, user);
 
@@ -87,7 +90,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketResponse updateTicket(Long ticketId, TicketRequest request, User user) {
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(TicketNotFoundException::new);
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
 
         authorizeTicketAccess(ticket, user);
 
@@ -111,11 +114,11 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void deleteTicket(Long ticketId, User user) {
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new TicketNotFoundException());
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
 
         if (user.getRole() != UserRole.ADMIN &&
                 !ticket.getUser().getId().equals(user.getId())) {
-            throw new TicketNotFoundException();
+            throw new ResourceNotFoundException("Ticket", ticketId);
         }
 
         ticketRepository.delete(ticket);
@@ -129,10 +132,10 @@ public class TicketServiceImpl implements TicketService {
         }
 
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
 
         User agent = userRepository.findById(agentId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new ResourceNotFoundException("User", agentId));
 
         if (agent.getRole() != UserRole.AGENT) {
             throw new IllegalStateException("The selected user is not an agent");
@@ -156,7 +159,7 @@ public class TicketServiceImpl implements TicketService {
                         ticket.getAgent().getId().equals(user.getId())) {
                     return;
                 }
-                throw new TicketNotFoundException();
+                throw new ResourceNotFoundException("Ticket", ticket.getId());
 
             case USER:
             case PREMIUM:
@@ -164,10 +167,10 @@ public class TicketServiceImpl implements TicketService {
                         ticket.getUser().getId().equals(user.getId())) {
                     return;
                 }
-                throw new TicketNotFoundException();
+                throw new ResourceNotFoundException("Ticket", ticket.getId());
 
             default:
-                throw new TicketNotFoundException();
+                throw new ResourceNotFoundException("Ticket", ticket.getId());
         }
     }
 

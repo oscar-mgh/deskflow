@@ -13,6 +13,7 @@ public class TicketResponse {
 
 	private Long id;
 	private String title;
+	private String code;
 	private String description;
 	private String status;
 	private String priority;
@@ -24,6 +25,7 @@ public class TicketResponse {
 	public TicketResponse(Ticket ticket) {
 		this.id = ticket.getId();
 		this.title = ticket.getTitle();
+		this.code = ticket.getCode();
 		this.description = ticket.getDescription();
 		this.status = ticket.getStatus().name();
 		this.priority = ticket.getPriority().name();

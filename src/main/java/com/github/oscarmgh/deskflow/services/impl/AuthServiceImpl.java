@@ -7,12 +7,11 @@ import com.github.oscarmgh.deskflow.dtos.auth.AuthResponse;
 import com.github.oscarmgh.deskflow.dtos.auth.LoginRequest;
 import com.github.oscarmgh.deskflow.dtos.auth.RegisterRequest;
 import com.github.oscarmgh.deskflow.entities.User;
-
 import com.github.oscarmgh.deskflow.entities.enums.UserRole;
 import com.github.oscarmgh.deskflow.exceptions.auth.EmailExistsException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InactiveUserException;
 import com.github.oscarmgh.deskflow.exceptions.auth.InvalidCredentialsException;
-import com.github.oscarmgh.deskflow.exceptions.auth.UserNotFoundException;
+import com.github.oscarmgh.deskflow.exceptions.tickets.ResourceNotFoundException;
 import com.github.oscarmgh.deskflow.repositories.UserRepository;
 import com.github.oscarmgh.deskflow.services.AuthService;
 import com.github.oscarmgh.deskflow.services.TokenService;
@@ -33,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
 		User user = userRepository.findByEmail(request.getEmail()).orElse(null);
 
 		if (user == null) {
-			throw new UserNotFoundException();
+			throw new ResourceNotFoundException("User", request.getEmail());
 		}
 
 		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {

@@ -52,7 +52,6 @@ public class TicketServiceImpl implements TicketService {
         User agent = agentService.findBestAvailableAgent();
         TicketCategory ticketCategory = ticketCategoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("TicketCategory", request.getCategoryId()));
-
         if (agent == null) {
             throw new IllegalStateException("No agents available");
         }

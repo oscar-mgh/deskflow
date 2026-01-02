@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import com.github.oscarmgh.deskflow.entities.enums.TicketFile;
 import com.github.oscarmgh.deskflow.entities.enums.TicketPriority;
 import com.github.oscarmgh.deskflow.entities.enums.TicketStatus;
 
@@ -85,6 +86,9 @@ public class Ticket {
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = OffsetDateTime.now(ZoneOffset.UTC);
+		if (this.status == null) {
+			this.status = TicketStatus.OPEN;
+		}
 		if (this.code == null) {
 			this.code = "TK-" + System.currentTimeMillis() % 100000;
 		}

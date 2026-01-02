@@ -1,6 +1,5 @@
 package com.github.oscarmgh.deskflow.dtos.ticket;
 
-
 import com.github.oscarmgh.deskflow.entities.enums.TicketPriority;
 import com.github.oscarmgh.deskflow.entities.enums.TicketStatus;
 

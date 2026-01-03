@@ -11,6 +11,7 @@ import com.github.oscarmgh.deskflow.dtos.ticket.TicketResponse;
 import com.github.oscarmgh.deskflow.entities.Ticket;
 import com.github.oscarmgh.deskflow.entities.TicketCategory;
 import com.github.oscarmgh.deskflow.entities.User;
+import com.github.oscarmgh.deskflow.entities.enums.TicketStatus;
 import com.github.oscarmgh.deskflow.entities.enums.UserRole;
 import com.github.oscarmgh.deskflow.exceptions.tickets.ResourceNotFoundException;
 import com.github.oscarmgh.deskflow.exceptions.tickets.UnauthorizedTicketAccessException;
@@ -48,25 +49,24 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @Transactional
     public TicketResponse createTicket(TicketRequest request, User user) {
+        TicketCategory category = ticketCategoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", request.getCategoryId()));
+
         User agent = agentService.findBestAvailableAgent();
-        TicketCategory ticketCategory = ticketCategoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("TicketCategory", request.getCategoryId()));
-        if (agent == null) {
-            throw new IllegalStateException("No agents available");
-        }
 
         Ticket ticket = Ticket.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .priority(request.getPriority())
+                .status(TicketStatus.OPEN)
                 .user(user)
                 .agent(agent)
-                .category(ticketCategory)
+                .category(category)
                 .build();
 
-        Ticket saved = ticketRepository.save(ticket);
-        return new TicketResponse(saved);
+        return new TicketResponse(ticketRepository.save(ticket));
     }
 
     @Override

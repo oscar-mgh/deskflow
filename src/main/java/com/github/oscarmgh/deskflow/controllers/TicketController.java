@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -59,11 +60,12 @@ public class TicketController {
 	}
 
 	@PostMapping("/tickets")
-	public TicketResponse create(
+	public ResponseEntity<TicketResponse> create(
 			@RequestBody TicketRequest request,
 			Authentication authentication) {
 		User user = (User) authentication.getPrincipal();
-		return ticketService.createTicket(request, user);
+		TicketResponse response = ticketService.createTicket(request, user);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@PatchMapping("/tickets/{id}")

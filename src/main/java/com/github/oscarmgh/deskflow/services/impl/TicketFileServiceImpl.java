@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.github.oscarmgh.deskflow.dtos.ticket.TicketFileMapper;
@@ -33,7 +34,12 @@ public class TicketFileServiceImpl implements TicketFileService {
 	private final TicketFileRepository ticketFileRepository;
 	private final CloudinaryService cloudinaryService;
 
+	@Override
+	@Transactional
 	public TicketFileResponse uploadFile(Long ticketId, MultipartFile file) {
+		if (file == null || file.isEmpty()) {
+			throw new IllegalArgumentException("File is empty");
+		}
 
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -44,18 +50,16 @@ public class TicketFileServiceImpl implements TicketFileService {
 		Ticket ticket = ticketRepository.findById(ticketId)
 				.orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
 
-		Map<String, Object> uploadResult = cloudinaryService.upload(file);
+		Map<String, Object> result = cloudinaryService.upload(file);
 
 		TicketFile ticketFile = new TicketFile();
 		ticketFile.setTicket(ticket);
-		ticketFile.setFileName(uploadResult.get("original_filename").toString());
+		ticketFile.setFileName(file.getOriginalFilename());
 		ticketFile.setMimeType(file.getContentType());
-		ticketFile.setFileUrl(uploadResult.get("secure_url").toString());
-		ticketFile.setPublicId(uploadResult.get("public_id").toString());
+		ticketFile.setFileUrl(result.get("secure_url").toString());
+		ticketFile.setPublicId(result.get("public_id").toString());
 
-		TicketFile saved = ticketFileRepository.save(ticketFile);
-
-		return TicketFileMapper.toResponse(saved);
+		return TicketFileMapper.toResponse(ticketFileRepository.save(ticketFile));
 	}
 
 	public List<TicketFileResponse> getFiles(Long ticketId) {

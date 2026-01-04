@@ -1,7 +1,9 @@
 package com.github.oscarmgh.deskflow.services.impl;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,17 +37,24 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public PageResponse<TicketResponse> getUserTickets(User user, Pageable pageable) {
 
-        Page<TicketResponse> page = ticketRepository.findByUser(user, pageable)
-                .map(TicketResponse::new);
+        Pageable sortedPageable = PageRequest.of(
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            Sort.by(Sort.Direction.DESC, "createdAt")
+    );
 
-        return PageResponse.<TicketResponse>builder()
-                .content(page.getContent())
-                .page(page.getNumber())
-                .size(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .last(page.isLast())
-                .build();
+    Page<TicketResponse> page = ticketRepository
+            .findByUser(user, sortedPageable)
+            .map(TicketResponse::new);
+
+    return PageResponse.<TicketResponse>builder()
+            .content(page.getContent())
+            .page(page.getNumber())
+            .size(page.getSize())
+            .totalElements(page.getTotalElements())
+            .totalPages(page.getTotalPages())
+            .last(page.isLast())
+            .build();
     }
 
     @Override

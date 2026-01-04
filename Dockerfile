@@ -6,4 +6,4 @@ RUN ./mvnw install -DskipTests
 FROM eclipse-temurin:17-jre-alpine
 VOLUME /tmp
 COPY --from=build /workspace/app/target/*.jar app.jar
-ENTRYPOINT ["java", "-XX:+UseSerialGC", "-Xss512k", "-XX:MaxRAMPercentage=75.0", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-XX:+UseSerialGC", "-Xss512k", "-XX:MaxRAMPercentage=75.0", "-Dserver.port=8080", "-Dserver.address=0.0.0.0", "-jar", "/app.jar"]

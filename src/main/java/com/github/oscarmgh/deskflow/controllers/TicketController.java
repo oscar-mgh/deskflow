@@ -48,15 +48,21 @@ public class TicketController {
 	private final TokenService tokenService;
 
 	@GetMapping("/tickets/{id}")
-	public TicketResponse userTicket(@PathVariable Long id, Authentication authentication) {
+	public TicketResponse getTicketById(@PathVariable Long id, Authentication authentication) {
 		User user = (User) authentication.getPrincipal();
 		return ticketService.getUserTicket(id, user);
 	}
 
 	@GetMapping("/tickets")
-	public PageResponse<TicketResponse> myTickets(Authentication authentication, Pageable pageable) {
+	public PageResponse<TicketResponse> findAllTickets(Authentication authentication, Pageable pageable) {
 		User user = (User) authentication.getPrincipal();
 		return ticketService.getUserTickets(user, pageable);
+	}
+
+	@GetMapping("/tickets/agent/{id}")
+	public PageResponse<TicketResponse> findAllTicketsByAgent(@PathVariable Long id, Authentication authentication, Pageable pageable) {
+		User user = (User) authentication.getPrincipal();
+		return ticketService.getTicketsByAgent(id, user, pageable);
 	}
 
 	@PostMapping("/tickets")

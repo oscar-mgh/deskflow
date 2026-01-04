@@ -13,15 +13,15 @@ import org.springframework.data.repository.query.Param;
 import com.github.oscarmgh.deskflow.entities.Ticket;
 import com.github.oscarmgh.deskflow.entities.TicketCategory;
 import com.github.oscarmgh.deskflow.entities.User;
-import com.github.oscarmgh.deskflow.entities.enums.TicketStatus;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
 	Page<Ticket> findByUser(User user, Pageable pageable);
 
-	List<Ticket> findByCategory(TicketCategory category);
+	@Query("SELECT t FROM Ticket t WHERE t.agent = :agent")
+	Page<Ticket> findByAgent(@Param("agent") User agent, Pageable pageable);
 
-	long countByAgentIdAndStatus(Long agentId, TicketStatus status);
+	List<Ticket> findByCategory(TicketCategory category);
 
 	@Query(value = "SELECT t.id FROM tickets t WHERE t.created_at < :cutoff ORDER BY t.created_at ASC LIMIT :limit", nativeQuery = true)
 	List<Long> findOldestIds(@Param("cutoff") Instant cutoff, @Param("limit") int limit);

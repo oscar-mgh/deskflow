@@ -49,6 +49,26 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public PageResponse<TicketResponse> getTicketsByAgent(Long id, User user, Pageable pageable) {
+        User agent = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Agent", id));
+        if (user.getRole() != UserRole.AGENT) {
+            throw new UnauthorizedTicketAccessException();
+        }
+        Page<TicketResponse> page = ticketRepository.findByAgent(agent, pageable)
+                .map(TicketResponse::new);
+
+        return PageResponse.<TicketResponse>builder()
+                .content(page.getContent())
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .last(page.isLast())
+                .build();
+    }
+
+    @Override
     @Transactional
     public TicketResponse createTicket(TicketRequest request, User user) {
         TicketCategory category = ticketCategoryRepository.findById(request.getCategoryId())

@@ -48,7 +48,7 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOriginPatterns(Arrays.asList("https://deskflow.fly.dev"));
+		configuration.setAllowedOriginPatterns(Arrays.asList("https://deskflow-app.vercel.app/"));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 		configuration.setAllowCredentials(true);

@@ -282,7 +282,7 @@ public class DataLoader implements CommandLineRunner {
                 Comment c2 = Comment.builder()
                                 .content("Gracias, quedo atento.")
                                 .ticket(t14)
-                                .user(normal)
+                                .user(premium)
                                 .build();
 
                 Comment c3 = Comment.builder()

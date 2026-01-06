@@ -11,6 +11,8 @@ import com.github.oscarmgh.deskflow.exceptions.tickets.UnauthorizedTicketAccessE
 import com.github.oscarmgh.deskflow.repositories.CommentRepository;
 import com.github.oscarmgh.deskflow.repositories.TicketRepository;
 import com.github.oscarmgh.deskflow.services.CommentService;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,19 +26,16 @@ public class CommentServiceImpl implements CommentService {
 	private final CommentRepository commentRepository;
 
 	@Override
+	@Transactional
 	public CommentResponse addComment(Long ticketId, CommentRequest request, User user) {
+		if (request.getContent() == null || request.getContent().trim().isEmpty()) {
+			throw new IllegalArgumentException("Comment content cannot be null or empty");
+		}
 
 		Ticket ticket = ticketRepository.findById(ticketId)
 				.orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
 
-		boolean isOwner = ticket.getUser().getId().equals(user.getId());
-		boolean isAgent = ticket.getAgent() != null &&
-				ticket.getAgent().getId().equals(user.getId());
-		boolean isAdmin = user.getRole() == UserRole.ADMIN;
-
-		if (!isOwner && !isAgent && !isAdmin) {
-			throw new UnauthorizedTicketAccessException();
-		}
+		validateUserAccess(ticket, user);
 
 		Comment comment = new Comment();
 		comment.setContent(request.getContent());
@@ -45,6 +44,16 @@ public class CommentServiceImpl implements CommentService {
 
 		Comment saved = commentRepository.save(comment);
 		return new CommentResponse(saved);
+	}
+
+	private void validateUserAccess(Ticket ticket, User user) {
+		boolean isOwner = ticket.getUser().getId().equals(user.getId());
+		boolean isAgent = ticket.getAgent() != null && ticket.getAgent().getId().equals(user.getId());
+		boolean isAdmin = user.getRole() == UserRole.ADMIN;
+
+		if (!isOwner && !isAgent && !isAdmin) {
+			throw new UnauthorizedTicketAccessException();
+		}
 	}
 
 	@Override

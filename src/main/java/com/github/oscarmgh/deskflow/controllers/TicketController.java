@@ -6,7 +6,6 @@ import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,33 +48,38 @@ public class TicketController {
 	private final TokenService tokenService;
 
 	@GetMapping("/tickets/{id}")
+	@ResponseStatus(HttpStatus.OK)
 	public TicketResponse getTicketById(@PathVariable Long id, Authentication authentication) {
 		User user = (User) authentication.getPrincipal();
 		return ticketService.getUserTicket(id, user);
 	}
 
 	@GetMapping("/tickets")
+	@ResponseStatus(HttpStatus.OK)
 	public PageResponse<TicketResponse> findAllTickets(Authentication authentication, Pageable pageable) {
 		User user = (User) authentication.getPrincipal();
 		return ticketService.getUserTickets(user, pageable);
 	}
 
 	@GetMapping("/tickets/agent/{id}")
-	public PageResponse<TicketResponse> findAllTicketsByAgent(@PathVariable Long id, Authentication authentication, Pageable pageable) {
+	@ResponseStatus(HttpStatus.OK)
+	public PageResponse<TicketResponse> findAllTicketsByAgent(@PathVariable Long id, Authentication authentication,
+			Pageable pageable) {
 		User user = (User) authentication.getPrincipal();
 		return ticketService.getTicketsByAgent(id, user, pageable);
 	}
 
 	@PostMapping("/tickets")
-	public ResponseEntity<TicketResponse> create(
+	@ResponseStatus(HttpStatus.CREATED)
+	public TicketResponse create(
 			@RequestBody TicketRequest request,
 			Authentication authentication) {
 		User user = (User) authentication.getPrincipal();
-		TicketResponse response = ticketService.createTicket(request, user);
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
+		return ticketService.createTicket(request, user);
 	}
 
 	@PatchMapping("/tickets/{id}")
+	@ResponseStatus(HttpStatus.OK)
 	public TicketResponse updateTicket(
 			@PathVariable Long id,
 			@RequestBody TicketRequest request,
@@ -84,34 +89,36 @@ public class TicketController {
 	}
 
 	@DeleteMapping("/tickets/{id}")
-	public ResponseEntity<Void> deleteTicket(@PathVariable Long id, Authentication authentication) {
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteTicket(@PathVariable Long id, Authentication authentication) {
 		User user = (User) authentication.getPrincipal();
 		ticketService.deleteTicket(id, user);
-		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/tickets/{id}/files")
+	@ResponseStatus(HttpStatus.OK)
 	public List<TicketFileResponse> getFiles(@PathVariable Long id) {
 		return fileService.getFiles(id);
 	}
 
 	@PostMapping(value = "/tickets/{id}/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<TicketFileResponse> uploadFile(
+	@ResponseStatus(HttpStatus.CREATED)
+	public TicketFileResponse uploadFile(
 			@PathVariable Long id,
 			@RequestParam("file") MultipartFile file) {
-		TicketFileResponse response = fileService.uploadFile(id, file);
-		return ResponseEntity.ok(response);
+		return fileService.uploadFile(id, file);
 	}
 
 	@DeleteMapping("/tickets/{id}/files/{fileId}")
-	public ResponseEntity<Void> deleteFile(
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteFile(
 			@PathVariable Long id,
 			@PathVariable Long fileId) {
 		fileService.deleteFile(id, fileId);
-		return ResponseEntity.noContent().build();
 	}
 
 	@PatchMapping("/admin/tickets/{id}/assign")
+	@ResponseStatus(HttpStatus.OK)
 	public TicketResponse assignAgent(
 			@PathVariable Long id,
 			@RequestBody AssignAgentRequest request,
@@ -121,6 +128,7 @@ public class TicketController {
 	}
 
 	@PostMapping("/tickets/{id}/comments")
+	@ResponseStatus(HttpStatus.CREATED)
 	public CommentResponse addComment(
 			@PathVariable Long id,
 			@RequestBody CommentRequest request,
@@ -130,6 +138,7 @@ public class TicketController {
 	}
 
 	@GetMapping("/tickets/{id}/comments")
+	@ResponseStatus(HttpStatus.OK)
 	public List<CommentResponse> getComments(
 			@PathVariable Long id,
 			Authentication authentication) {
@@ -138,7 +147,8 @@ public class TicketController {
 	}
 
 	@PostMapping("/upgrade")
-	public ResponseEntity<Map<String, String>> upgrade(Authentication authentication) {
+	@ResponseStatus(HttpStatus.CREATED)
+	public Map<String, String> upgrade(Authentication authentication) {
 		String email = authentication.getName();
 
 		userRepository.updateRole(email, UserRole.PREMIUM);
@@ -147,6 +157,6 @@ public class TicketController {
 
 		String newToken = tokenService.generateToken(updated);
 
-		return ResponseEntity.ok(Map.of("token", newToken));
+		return Map.of("token", newToken);
 	}
 }

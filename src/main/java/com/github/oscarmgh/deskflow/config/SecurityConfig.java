@@ -37,9 +37,11 @@ public class SecurityConfig {
 				.httpBasic(basic -> basic.disable())
 				.formLogin(form -> form.disable())
 				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/api/v1/actuator/**").permitAll()
 						.requestMatchers("/api/v1/auth/**").permitAll()
 						.requestMatchers("/api/v1/public/**").permitAll()
 						.requestMatchers("/api/v1/categories", "/api/v1/categories/**").permitAll()
+						.requestMatchers("/api/v1/tickets/agent/{id}").hasRole("AGENT")
 						.anyRequest().authenticated())
 				.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();

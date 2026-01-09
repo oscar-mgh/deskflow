@@ -61,9 +61,9 @@ public class TicketServiceImpl implements TicketService {
     public PageResponse<TicketResponse> getTicketsByAgent(Long id, User user, Pageable pageable) {
         User agent = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Agent", id));
-        if (user.getRole() != UserRole.AGENT) {
-            throw new UnauthorizedTicketAccessException();
-        }
+        // if (user.getRole() != UserRole.AGENT) {
+        //     throw new UnauthorizedTicketAccessException();
+        // }
         Page<TicketResponse> page = ticketRepository.findByAgent(agent, pageable)
                 .map(TicketResponse::new);
 

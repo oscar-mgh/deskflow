@@ -8,9 +8,9 @@ primary_region = 'lax'
 
 [build]
 
-# [[mounts]]
-#   source = 'tmp'
-#   destination = '/tmp'
+[[mounts]]
+  source = 'tmp'
+  destination = '/tmp'
 
 [http_service]
   internal_port = 8080

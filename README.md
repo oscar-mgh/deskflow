@@ -72,6 +72,7 @@ DeskFlow API es un servicio backend RESTful robusto diseñado para la gestión i
 - **Manejo centralizado de excepciones**: `GlobalExceptionHandler` para gestión de errores
 - **Filtros de seguridad personalizados**: `AuthFilter` para validación de tokens en cada request
 
+
 ---
 
 ## 🚀 Información de Uso
